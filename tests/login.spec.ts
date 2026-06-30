@@ -1,19 +1,32 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/baseTest';
+import { loginData } from '../data/loginData';
 
-test('Successful Login', async ({ page }) => {
+test.beforeEach(async ({ loginPage }) => {
+  console.log('Logging in...');
 
-  // Step 1: Open website
-  await page.goto('https://www.saucedemo.com/');
-
-  // Step 2: Enter username
-await page.locator('#user-name').fill('standard_user');
-  // Step 3: Enter password
-  await page.getByPlaceholder('Password').fill('secret_sauce');
-
-  // Step 4: Click Login
-  await page.getByRole('button', { name: 'Login' }).click();
-
-  // Step 5: Verify login
-  await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
-
+  await loginPage.login(
+    loginData.username,
+    loginData.password
+  );
 });
+
+test('View Products', async ({ page }) => {
+  await expect(page).toHaveURL(
+    'https://www.saucedemo.com/inventory.html'
+  );
+});
+
+test('Open Menu', async ({ page }) => {
+  await page.locator('#react-burger-menu-btn').click();
+
+  await expect(
+    page.locator('.bm-menu')
+  ).toBeVisible();
+});
+
+test('Verify Cart Icon', async ({ page }) => {
+  await expect(
+    page.locator('.shopping_cart_link')
+  ).toBeVisible();
+});
+
